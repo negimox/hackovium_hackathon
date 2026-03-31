@@ -1,0 +1,9 @@
+{
+  "chat.tools.terminal.autoApprove": {
+    "/^python3 -m py_compile crews/planning_crew\\.py && python3 -m py_compile tools/financial_calculator\\.py && echo \"Syntax OK\"$/": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+    "npx tsc": true
+  }
+}

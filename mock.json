@@ -1,0 +1,684 @@
+{
+  "dashboardStats": [
+    {
+      "label": "PORTFOLIO VALUE",
+      "value": "₹8,45,230",
+      "description": "TOTAL INVESTMENT",
+      "intent": "positive",
+      "icon": "gear",
+      "direction": "up",
+      "tag": "+12.5%"
+    },
+    {
+      "label": "DAY CHANGE",
+      "value": "₹2,450",
+      "description": "TODAY'S GAIN/LOSS",
+      "intent": "positive",
+      "icon": "proccesor",
+      "direction": "up"
+    },
+    {
+      "label": "WATCHLIST",
+      "value": "24",
+      "description": "STOCKS TRACKED",
+      "intent": "neutral",
+      "icon": "boom",
+      "tag": "8 new stocks"
+    }
+  ],
+  "chartData": {
+    "week": [
+      {
+        "date": "Mon",
+        "value": 45230,
+        "indexValue": 75432
+      },
+      {
+        "date": "Tue",
+        "value": 48900,
+        "indexValue": 76100
+      },
+      {
+        "date": "Wed",
+        "value": 52100,
+        "indexValue": 77850
+      },
+      {
+        "date": "Thu",
+        "value": 50500,
+        "indexValue": 76950
+      },
+      {
+        "date": "Fri",
+        "value": 56230,
+        "indexValue": 79200
+      },
+      {
+        "date": "Sat",
+        "value": 57800,
+        "indexValue": 79850
+      },
+      {
+        "date": "Sun",
+        "value": 59100,
+        "indexValue": 80500
+      }
+    ],
+    "month": [
+      {
+        "date": "Week 1",
+        "value": 42000,
+        "indexValue": 74500
+      },
+      {
+        "date": "Week 2",
+        "value": 45600,
+        "indexValue": 75800
+      },
+      {
+        "date": "Week 3",
+        "value": 51200,
+        "indexValue": 78200
+      },
+      {
+        "date": "Week 4",
+        "value": 59100,
+        "indexValue": 80500
+      }
+    ],
+    "year": [
+      {
+        "date": "Jan",
+        "value": 65000,
+        "indexValue": 72000
+      },
+      {
+        "date": "Feb",
+        "value": 68500,
+        "indexValue": 73500
+      },
+      {
+        "date": "Mar",
+        "value": 71200,
+        "indexValue": 75200
+      },
+      {
+        "date": "Apr",
+        "value": 69800,
+        "indexValue": 74800
+      },
+      {
+        "date": "May",
+        "value": 73500,
+        "indexValue": 77200
+      },
+      {
+        "date": "Jun",
+        "value": 76200,
+        "indexValue": 78900
+      },
+      {
+        "date": "Jul",
+        "value": 79100,
+        "indexValue": 80500
+      },
+      {
+        "date": "Aug",
+        "value": 77500,
+        "indexValue": 79200
+      },
+      {
+        "date": "Sep",
+        "value": 81200,
+        "indexValue": 82100
+      },
+      {
+        "date": "Oct",
+        "value": 83900,
+        "indexValue": 84500
+      },
+      {
+        "date": "Nov",
+        "value": 85200,
+        "indexValue": 85800
+      },
+      {
+        "date": "Dec",
+        "value": 87600,
+        "indexValue": 87200
+      }
+    ]
+  },
+  "topStocks": [
+    {
+      "id": "stock-1",
+      "symbol": "TCS",
+      "name": "Tata Consultancy Services",
+      "price": 3750,
+      "change": 125,
+      "changePercent": 3.45,
+      "volume": 2850000,
+      "marketCap": "12.5T",
+      "sector": "IT",
+      "pe": 28.5,
+      "dividendYield": 1.2,
+      "dayHigh": 3780,
+      "dayLow": 3720,
+      "52WeekHigh": 4100,
+      "52WeekLow": 3200,
+      "eps": 131.5,
+      "bookValue": 145.8
+    },
+    {
+      "id": "stock-2",
+      "symbol": "INFY",
+      "name": "Infosys",
+      "price": 2450,
+      "change": -35,
+      "changePercent": -1.41,
+      "volume": 3200000,
+      "marketCap": "10.2T",
+      "sector": "IT",
+      "pe": 32.1,
+      "dividendYield": 1.8,
+      "dayHigh": 2520,
+      "dayLow": 2440,
+      "52WeekHigh": 2800,
+      "52WeekLow": 2100,
+      "eps": 76.3,
+      "bookValue": 98.2
+    },
+    {
+      "id": "stock-3",
+      "symbol": "HDFC",
+      "name": "HDFC Bank",
+      "price": 1825,
+      "change": 45,
+      "changePercent": 2.53,
+      "volume": 5600000,
+      "marketCap": "14.8T",
+      "sector": "Banking",
+      "pe": 24.3,
+      "dividendYield": 2.5,
+      "dayHigh": 1850,
+      "dayLow": 1810,
+      "52WeekHigh": 2050,
+      "52WeekLow": 1500,
+      "eps": 75.2,
+      "bookValue": 234.5
+    },
+    {
+      "id": "stock-4",
+      "symbol": "RELIANCE",
+      "name": "Reliance Industries",
+      "price": 2950,
+      "change": 85,
+      "changePercent": 2.97,
+      "volume": 4200000,
+      "marketCap": "25.3T",
+      "sector": "Energy",
+      "pe": 22.8,
+      "dividendYield": 1.1,
+      "dayHigh": 2980,
+      "dayLow": 2920,
+      "52WeekHigh": 3200,
+      "52WeekLow": 2500,
+      "eps": 129.3,
+      "bookValue": 456.7
+    },
+    {
+      "id": "stock-5",
+      "symbol": "WIPRO",
+      "name": "Wipro",
+      "price": 440,
+      "change": -8,
+      "changePercent": -1.78,
+      "volume": 6800000,
+      "marketCap": "1.85T",
+      "sector": "IT",
+      "pe": 18.5,
+      "dividendYield": 2.1,
+      "dayHigh": 455,
+      "dayLow": 438,
+      "52WeekHigh": 510,
+      "52WeekLow": 380,
+      "eps": 23.8,
+      "bookValue": 45.2
+    },
+    {
+      "id": "stock-6",
+      "symbol": "SBIN",
+      "name": "State Bank of India",
+      "price": 625,
+      "change": 12,
+      "changePercent": 1.95,
+      "volume": 8900000,
+      "marketCap": "6.5T",
+      "sector": "Banking",
+      "pe": 15.2,
+      "dividendYield": 4.2,
+      "dayHigh": 635,
+      "dayLow": 620,
+      "52WeekHigh": 750,
+      "52WeekLow": 520,
+      "eps": 41.1,
+      "bookValue": 128.5
+    }
+  ],
+  "funds": [
+    {
+      "id": "fund-1",
+      "symbol": "MIDRCP-G",
+      "name": "Mirae Asset Midcap Fund",
+      "type": "mutual",
+      "nav": 285.45,
+      "change": 8.5,
+      "changePercent": 3.06,
+      "expenseRatio": 0.65,
+      "returns1Y": 22.5,
+      "returns3Y": 18.2,
+      "returns5Y": 15.8,
+      "aum": "8,450 Cr",
+      "riskProfile": "high",
+      "category": "Midcap Growth",
+      "fundManager": "Sandeep Tandon"
+    },
+    {
+      "id": "fund-2",
+      "symbol": "NIFTYBEES",
+      "name": "Nifty BeES ETF",
+      "type": "etf",
+      "nav": 325.80,
+      "change": 5.2,
+      "changePercent": 1.62,
+      "expenseRatio": 0.02,
+      "returns1Y": 18.3,
+      "returns3Y": 12.5,
+      "returns5Y": 10.2,
+      "aum": "12,000 Cr",
+      "riskProfile": "moderate",
+      "category": "Nifty 50 ETF",
+      "fundManager": "Benchmark"
+    },
+    {
+      "id": "fund-3",
+      "symbol": "AXISGROWTH-G",
+      "name": "Axis Focused 25 Fund",
+      "type": "mutual",
+      "nav": 425.30,
+      "change": 12.3,
+      "changePercent": 2.97,
+      "expenseRatio": 0.58,
+      "returns1Y": 25.8,
+      "returns3Y": 20.1,
+      "returns5Y": 17.5,
+      "aum": "5,230 Cr",
+      "riskProfile": "high",
+      "category": "Focused Equity",
+      "fundManager": "Sanjay Patel"
+    }
+  ],
+  "news": [
+    {
+      "id": "news-1",
+      "title": "TCS posts strong Q3 earnings beating estimates",
+      "summary": "Tata Consultancy Services reported better-than-expected quarterly results with strong revenue growth.",
+      "content": "TCS delivered strong Q3 results with revenue growth of 6.2% QoQ and profit growth of 8.5%. The IT services giant outperformed market expectations driven by strong digital services demand.",
+      "source": "Economic Times",
+      "timestamp": "2025-02-01T14:30:00Z",
+      "symbol": "TCS",
+      "impact": "positive",
+      "predictedImpact": "Stock likely to rally 2-3% in coming days",
+      "sentimentScore": 0.85,
+      "read": false
+    },
+    {
+      "id": "news-2",
+      "title": "RBI to maintain status quo on rates",
+      "summary": "Reserve Bank of India expected to keep interest rates unchanged in February monetary policy",
+      "content": "Market analysts predict the RBI will maintain the repo rate at 6.5% in the upcoming monetary policy review. This indicates a pause in the current rate hiking cycle.",
+      "source": "Financial Express",
+      "timestamp": "2025-02-01T12:15:00Z",
+      "symbol": "SBIN",
+      "impact": "neutral",
+      "predictedImpact": "Banking stocks to move sideways",
+      "sentimentScore": 0.0,
+      "read": false
+    },
+    {
+      "id": "news-3",
+      "title": "Crude oil prices surge on geopolitical tensions",
+      "summary": "Oil futures rally as Middle East tensions escalate, impacting energy stocks",
+      "content": "Crude oil prices climbed to 85 USD per barrel amid escalating geopolitical tensions in the Middle East. This development could boost refining margins and energy sector stocks.",
+      "source": "Reuters",
+      "timestamp": "2025-02-01T10:45:00Z",
+      "symbol": "RELIANCE",
+      "impact": "positive",
+      "predictedImpact": "Energy stocks expected to outperform",
+      "sentimentScore": 0.72,
+      "read": false
+    },
+    {
+      "id": "news-4",
+      "title": "Rupee weakens against US dollar",
+      "summary": "Indian rupee depreciated 0.35% against the US dollar amid dollar strength",
+      "content": "The Indian rupee weakened to 83.45 per USD from 83.15, reflecting broader dollar strength and capital outflows from emerging markets.",
+      "source": "Business Standard",
+      "timestamp": "2025-01-31T16:20:00Z",
+      "symbol": "INFY",
+      "impact": "negative",
+      "predictedImpact": "IT exporters could benefit from favorable exchange rates",
+      "sentimentScore": 0.45,
+      "read": true
+    },
+    {
+      "id": "news-5",
+      "title": "HDFC Bank launches new digital banking platform",
+      "summary": "HDFC Bank unveiled advanced digital banking features to enhance customer experience",
+      "content": "HDFC Bank launched an upgraded digital platform with AI-powered features for better customer experience and seamless transactions.",
+      "source": "Mint",
+      "timestamp": "2025-01-31T11:00:00Z",
+      "symbol": "HDFC",
+      "impact": "positive",
+      "predictedImpact": "Positive for long-term growth story",
+      "sentimentScore": 0.65,
+      "read": true
+    }
+  ],
+  "widgetData": {
+    "marketStatus": "open",
+    "time": "02:30 PM",
+    "sensex": 80250,
+    "nifty": 24510,
+    "indexChange": 185,
+    "indexChangePercent": 0.76,
+    "date": "Monday, February 2st, 2025"
+  },
+  "portfolio": {
+    "totalValue": 845230,
+    "totalInvested": 750000,
+    "totalGainLoss": 95230,
+    "totalGainLossPercent": 12.7,
+    "dayChange": 2450,
+    "dayChangePercent": 0.29,
+    "sectorAllocation": {
+      "IT": 35,
+      "Banking": 28,
+      "Energy": 15,
+      "Pharma": 12,
+      "Auto": 10
+    },
+    "holdings": [
+      {
+        "id": "hold-1",
+        "symbol": "TCS",
+        "name": "Tata Consultancy Services",
+        "quantity": 50,
+        "buyPrice": 3200,
+        "currentPrice": 3750,
+        "value": 187500,
+        "gainLoss": 27500,
+        "gainLossPercent": 17.18,
+        "type": "stock"
+      },
+      {
+        "id": "hold-2",
+        "symbol": "HDFC",
+        "name": "HDFC Bank",
+        "quantity": 100,
+        "buyPrice": 1650,
+        "currentPrice": 1825,
+        "value": 182500,
+        "gainLoss": 17500,
+        "gainLossPercent": 10.61,
+        "type": "stock"
+      },
+      {
+        "id": "hold-3",
+        "symbol": "NIFTYBEES",
+        "name": "Nifty BeES ETF",
+        "quantity": 200,
+        "buyPrice": 310,
+        "currentPrice": 325.80,
+        "value": 65160,
+        "gainLoss": 3160,
+        "gainLossPercent": 5.10,
+        "type": "etf"
+      },
+      {
+        "id": "hold-4",
+        "symbol": "MIDRCP-G",
+        "name": "Mirae Asset Midcap Fund",
+        "quantity": 500,
+        "buyPrice": 250,
+        "currentPrice": 285.45,
+        "value": 142725,
+        "gainLoss": 17725,
+        "gainLossPercent": 14.18,
+        "type": "mutual"
+      },
+      {
+        "id": "hold-5",
+        "symbol": "SBIN",
+        "name": "State Bank of India",
+        "quantity": 250,
+        "buyPrice": 580,
+        "currentPrice": 625,
+        "value": 156250,
+        "gainLoss": 11250,
+        "gainLossPercent": 7.76,
+        "type": "stock"
+      },
+      {
+        "id": "hold-6",
+        "symbol": "RELIANCE",
+        "name": "Reliance Industries",
+        "quantity": 25,
+        "buyPrice": 2800,
+        "currentPrice": 2950,
+        "value": 73750,
+        "gainLoss": 3750,
+        "gainLossPercent": 5.36,
+        "type": "stock"
+      }
+    ]
+  },
+  "marketMood": {
+    "index": 72,
+    "sentiment": "positive",
+    "trend": "up",
+    "buyerSentiment": 68,
+    "sellerSentiment": 32,
+    "volatilityIndex": 18.5,
+    "breadthAdvance": 2125,
+    "breadthDecline": 895
+  },
+  "watchlist": {
+    "categories": [
+      {
+        "name": "INDICES",
+        "isExpanded": true,
+        "items": [
+          {
+            "id": "idx-1",
+            "symbol": "SPX",
+            "name": "S&P 500",
+            "price": 6843.21,
+            "change": 7.03,
+            "changePercent": 0.10
+          },
+          {
+            "id": "idx-2",
+            "symbol": "NDQ",
+            "name": "NASDAQ 100",
+            "price": 24701.59,
+            "change": -31.15,
+            "changePercent": -0.13
+          },
+          {
+            "id": "idx-3",
+            "symbol": "DJI",
+            "name": "Dow Jones Industrial",
+            "price": 49533.19,
+            "change": 32.26,
+            "changePercent": 0.07
+          },
+          {
+            "id": "idx-4",
+            "symbol": "VIX",
+            "name": "Volatility Index",
+            "price": 20.29,
+            "change": -0.91,
+            "changePercent": -4.29
+          },
+          {
+            "id": "idx-5",
+            "symbol": "DXY",
+            "name": "US Dollar Index",
+            "price": 97.107,
+            "change": 0.009,
+            "changePercent": 0.01
+          }
+        ]
+      },
+      {
+        "name": "STOCKS",
+        "isExpanded": true,
+        "items": [
+          {
+            "id": "stk-1",
+            "symbol": "AAPL",
+            "name": "Apple Inc.",
+            "price": 263.88,
+            "change": 8.10,
+            "changePercent": 3.17
+          },
+          {
+            "id": "stk-2",
+            "symbol": "TSLA",
+            "name": "Tesla Inc.",
+            "price": 410.63,
+            "change": -6.81,
+            "changePercent": -1.63
+          },
+          {
+            "id": "stk-3",
+            "symbol": "NFLX",
+            "name": "Netflix Inc.",
+            "price": 77.00,
+            "change": 0.13,
+            "changePercent": 0.17
+          },
+          {
+            "id": "stk-4",
+            "symbol": "MSFT",
+            "name": "Microsoft Corporation",
+            "price": 445.22,
+            "change": 12.45,
+            "changePercent": 2.88
+          },
+          {
+            "id": "stk-5",
+            "symbol": "GOOGL",
+            "name": "Alphabet Inc.",
+            "price": 189.75,
+            "change": -2.33,
+            "changePercent": -1.21
+          },
+          {
+            "id": "stk-6",
+            "symbol": "AMZN",
+            "name": "Amazon.com Inc.",
+            "price": 225.80,
+            "change": 5.67,
+            "changePercent": 2.57
+          }
+        ]
+      },
+      {
+        "name": "FUTURES",
+        "isExpanded": true,
+        "items": [
+          {
+            "id": "fut-1",
+            "symbol": "USOIL",
+            "name": "Crude Oil WTI",
+            "price": 62.22,
+            "change": -0.07,
+            "changePercent": -0.11
+          },
+          {
+            "id": "fut-2",
+            "symbol": "GOLD",
+            "name": "Gold Futures",
+            "price": 4872.731,
+            "change": -6.249,
+            "changePercent": -0.13
+          },
+          {
+            "id": "fut-3",
+            "symbol": "SILVER",
+            "name": "Silver Futures",
+            "price": 73.4240,
+            "change": -0.0750,
+            "changePercent": -0.10
+          },
+          {
+            "id": "fut-4",
+            "symbol": "NATGAS",
+            "name": "Natural Gas",
+            "price": 3.845,
+            "change": 0.125,
+            "changePercent": 3.36
+          }
+        ]
+      },
+      {
+        "name": "FOREX",
+        "isExpanded": true,
+        "items": [
+          {
+            "id": "fx-1",
+            "symbol": "EURUSD",
+            "name": "Euro / US Dollar",
+            "price": 1.18570,
+            "change": 0.00019,
+            "changePercent": 0.02
+          },
+          {
+            "id": "fx-2",
+            "symbol": "GBPUSD",
+            "name": "British Pound / US Dollar",
+            "price": 1.35704,
+            "change": 0.00062,
+            "changePercent": 0.05
+          },
+          {
+            "id": "fx-3",
+            "symbol": "USDJPY",
+            "name": "US Dollar / Japanese Yen",
+            "price": 153.2203,
+            "change": -0.032,
+            "changePercent": -0.02
+          },
+          {
+            "id": "fx-4",
+            "symbol": "USDCHF",
+            "name": "US Dollar / Swiss Franc",
+            "price": 0.8245,
+            "change": 0.0015,
+            "changePercent": 0.18
+          },
+          {
+            "id": "fx-5",
+            "symbol": "AUDUSD",
+            "name": "Australian Dollar / US Dollar",
+            "price": 0.6789,
+            "change": -0.0023,
+            "changePercent": -0.34
+          }
+        ]
+      }
+    ]
+  }
+}
