@@ -107,7 +107,79 @@ function FundCard({
   sipAmount?: number;
   marketMatch?: MarketData;
 }) {
-  const isPositive = (marketMatch?.change || 0) >= 0;
+  const [navData, setNavData] = useState<{
+    price: number;
+    change: number;
+    percent: number;
+    isPositive: boolean;
+  } | null>(null);
+  const [loadingNav, setLoadingNav] = useState(false);
+
+  useEffect(() => {
+    if (!fund.schemeCode || marketMatch) return;
+
+    const fetchNAV = async () => {
+      setLoadingNav(true);
+      try {
+        // First get the latest NAV (fast)
+        const latestRes = await fetch(
+          `https://api.mfapi.in/mf/${fund.schemeCode}/latest`,
+        );
+        const latestJson = await latestRes.json();
+
+        if (latestJson.data && latestJson.data.length > 0) {
+          const latestPrice = parseFloat(latestJson.data[0].nav);
+
+          // Now fetch full history for trend (optional, don't block display of price)
+          setNavData({
+            price: latestPrice,
+            change: 0,
+            percent: 0,
+            isPositive: true,
+          });
+
+          // Secondary fetch for trend
+          try {
+            const histRes = await fetch(
+              `https://api.mfapi.in/mf/${fund.schemeCode}`,
+            );
+            const histJson = await histRes.json();
+            if (histJson.data && histJson.data.length >= 2) {
+              const latest = parseFloat(histJson.data[0].nav);
+              const previous = parseFloat(histJson.data[1].nav);
+              const change = latest - previous;
+              const percent = (change / previous) * 100;
+              setNavData({
+                price: latest,
+                change: change,
+                percent: percent,
+                isPositive: change >= 0,
+              });
+            }
+          } catch (e) {
+            console.warn("Could not fetch trend for", fund.name);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch NAV for", fund.name, err);
+      } finally {
+        setLoadingNav(false);
+      }
+    };
+
+    fetchNAV();
+  }, [fund.schemeCode, fund.name, marketMatch]);
+
+  const displayData = marketMatch
+    ? {
+        price: marketMatch.price,
+        change: marketMatch.change,
+        percent: marketMatch.percent,
+        isPositive: marketMatch.change >= 0,
+      }
+    : navData;
+
+  const isPositive = displayData?.isPositive ?? false;
   // Use resolved schemeCode if available, else try fallback
   const href = fund.schemeCode
     ? `/dashboard/stock/fund-${fund.schemeCode}`
@@ -156,16 +228,15 @@ function FundCard({
         {/* Market Price or Returns Summary */}
         <div className="flex items-end justify-between">
           <div>
-            <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">
-              {marketMatch ? "Current NAV" : "Expected Return"}
-            </p>
             <div className="flex items-baseline gap-2">
               <span className="text-lg font-bold font-display">
-                {marketMatch
-                  ? `₹${marketMatch.price.toLocaleString("en-IN")}`
-                  : `${fund.expected_return_pct}% p.a.`}
+                {displayData
+                  ? `₹${displayData.price.toLocaleString("en-IN")}`
+                  : fund.expected_return_pct
+                    ? `${fund.expected_return_pct}% p.a.`
+                    : "—"}
               </span>
-              {marketMatch && (
+              {displayData && (
                 <span
                   className={`text-xs font-semibold flex items-center gap-0.5 ${isPositive ? "text-emerald-400" : "text-red-400"}`}
                 >
@@ -174,8 +245,11 @@ function FundCard({
                   ) : (
                     <TrendingDown className="w-3 h-3" />
                   )}
-                  {marketMatch.percent.toFixed(2)}%
+                  {Math.abs(displayData.percent).toFixed(2)}%
                 </span>
+              )}
+              {loadingNav && (
+                <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />
               )}
             </div>
           </div>
@@ -213,36 +287,17 @@ function FundCard({
           )}
         </div>
 
-        {/* Returns Grid */}
-        <div className="grid grid-cols-3 gap-2 text-center py-2.5 bg-muted/30 rounded-xl border border-border/20">
-          <div>
-            <p className="text-[9px] text-muted-foreground uppercase font-bold">
-              1Y Return
-            </p>
-            <p
-              className={`text-xs font-bold ${(fund.returns_1y_pct || 0) >= 0 ? "text-emerald-400" : "text-red-400"}`}
-            >
-              {fund.returns_1y_pct != null ? `${fund.returns_1y_pct}%` : "—"}
-            </p>
-          </div>
+        <div className="flex items-center justify-center py-2.5 bg-muted/30 rounded-xl border border-border/20">
           <div>
             <p className="text-[9px] text-muted-foreground uppercase font-bold">
               3Y Return
             </p>
             <p
-              className={`text-xs font-bold ${(fund.returns_3y_pct || 0) >= 0 ? "text-emerald-400" : "text-red-400"}`}
+              className={`text-xs font-bold font-display ${(fund.returns_3y_pct || 0) >= 0 ? "text-emerald-400" : "text-red-400"}`}
             >
-              {fund.returns_3y_pct != null ? `${fund.returns_3y_pct}%` : "—"}
-            </p>
-          </div>
-          <div>
-            <p className="text-[9px] text-muted-foreground uppercase font-bold">
-              5Y Return
-            </p>
-            <p
-              className={`text-xs font-bold ${(fund.returns_5y_pct || 0) >= 0 ? "text-emerald-400" : "text-red-400"}`}
-            >
-              {fund.returns_5y_pct != null ? `${fund.returns_5y_pct}%` : "—"}
+              {fund.returns_3y_pct != null
+                ? `${fund.returns_3y_pct > 0 ? "+" : ""}${fund.returns_3y_pct}%`
+                : "—"}
             </p>
           </div>
         </div>
@@ -409,11 +464,10 @@ export default function InvestmentsPage() {
   const [marketData, setMarketData] = useState<Record<string, MarketData>>({});
   const [loading, setLoading] = useState(true);
 
-  const resolveFundCodes = async (
-    options: Record<string, FundRecommendation[]>,
-  ) => {
-    const updatedOptions = { ...options };
-    const allFunds = Object.values(updatedOptions).flat();
+  const resolveFundCodes = useCallback(
+    async (options: Record<string, FundRecommendation[]>) => {
+      const updatedOptions = { ...options };
+      const allFunds = Object.values(updatedOptions).flat();
 
     // Resolve in parallel
     await Promise.all(
@@ -462,7 +516,7 @@ export default function InvestmentsPage() {
       }),
     );
     return updatedOptions;
-  };
+  }, []);
 
   const fetchMarketData = useCallback(async () => {
     try {
@@ -582,7 +636,20 @@ export default function InvestmentsPage() {
     );
   }
 
-  const currentMonth = plan.monthly_plan?.[0] || {};
+  // Find the first month where active investing starts (SIP > 0)
+  // or fall back to the first month
+  const currentMonth =
+    plan.monthly_plan?.find(
+      (m) =>
+        (m.sip_large_cap || 0) +
+          (m.sip_mid_cap || 0) +
+          (m.sip_small_cap || 0) +
+          (m.sip_debt || 0) +
+          (m.sip_gold || 0) >
+        0,
+    ) ||
+    plan.monthly_plan?.[0] ||
+    {};
   const fundOptions = plan.fund_options || {};
 
   const categories = [
@@ -593,7 +660,11 @@ export default function InvestmentsPage() {
       icon: Building2,
       color: "bg-emerald-500",
       funds: fundOptions.large_cap_funds || currentMonth.large_cap_funds || [],
-      sipAmount: currentMonth.sip_large_cap || 0,
+      sipAmount:
+        currentMonth.sip_large_cap ||
+        (currentMonth as any).large_cap ||
+        (currentMonth as any).sip_large ||
+        0,
       tradingViewSymbol: "NSE:NIFTY",
     },
     {
@@ -603,7 +674,11 @@ export default function InvestmentsPage() {
       icon: TrendingUp,
       color: "bg-sky-500",
       funds: fundOptions.mid_cap_funds || currentMonth.mid_cap_funds || [],
-      sipAmount: currentMonth.sip_mid_cap || 0,
+      sipAmount:
+        currentMonth.sip_mid_cap ||
+        (currentMonth as any).mid_cap ||
+        (currentMonth as any).sip_mid ||
+        0,
       tradingViewSymbol: "NSE:NIFTYMIDCAP100",
     },
     {
@@ -613,7 +688,11 @@ export default function InvestmentsPage() {
       icon: TrendingUp,
       color: "bg-violet-500",
       funds: fundOptions.small_cap_funds || currentMonth.small_cap_funds || [],
-      sipAmount: currentMonth.sip_small_cap || 0,
+      sipAmount:
+        currentMonth.sip_small_cap ||
+        (currentMonth as any).small_cap ||
+        (currentMonth as any).sip_small ||
+        0,
       tradingViewSymbol: "NSE:NIFTYSMALLCAP100",
     },
     {
@@ -623,7 +702,11 @@ export default function InvestmentsPage() {
       icon: Wallet,
       color: "bg-amber-500",
       funds: fundOptions.debt_funds || currentMonth.debt_funds || [],
-      sipAmount: currentMonth.sip_debt || 0,
+      sipAmount:
+        currentMonth.sip_debt ||
+        (currentMonth as any).debt ||
+        (currentMonth as any).sip_debt_funds ||
+        0,
       tradingViewSymbol: "TVC:IN10Y",
     },
     {
@@ -633,7 +716,11 @@ export default function InvestmentsPage() {
       icon: Coins,
       color: "bg-yellow-500",
       funds: fundOptions.gold_funds || currentMonth.gold_funds || [],
-      sipAmount: currentMonth.sip_gold || 0,
+      sipAmount:
+        currentMonth.sip_gold ||
+        (currentMonth as any).gold ||
+        (currentMonth as any).sip_gold_funds ||
+        0,
       tradingViewSymbol: "OANDA:XAUUSD",
     },
   ];

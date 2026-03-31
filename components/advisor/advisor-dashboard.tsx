@@ -181,7 +181,10 @@ export default function AdvisorDashboard() {
 
       {/* Advised Investments */}
       {plan.fund_options && (
-        <AdvisedInvestments fundOptions={plan.fund_options} />
+        <AdvisedInvestments
+          fundOptions={plan.fund_options}
+          monthlyPlan={plan.monthly_plan}
+        />
       )}
 
       {/* Two Column Grid */}

@@ -58,12 +58,24 @@ interface FundRecommendation {
   schemeCode?: string; // Added by component
 }
 
+interface MonthlyPlanItem {
+  month: number;
+  sip_large_cap?: number;
+  sip_mid_cap?: number;
+  sip_small_cap?: number;
+  sip_debt?: number;
+  sip_gold?: number;
+  [key: string]: any;
+}
+
 interface AdvisedInvestmentsProps {
   fundOptions: Record<string, FundRecommendation[]>;
+  monthlyPlan?: MonthlyPlanItem[];
 }
 
 export default function AdvisedInvestments({
   fundOptions,
+  monthlyPlan,
 }: AdvisedInvestmentsProps) {
   const [marketData, setMarketData] = useState<Record<string, MarketData>>({});
   const [resolvedFunds, setResolvedFunds] = useState<FundRecommendation[]>([]);
@@ -135,54 +147,128 @@ export default function AdvisedInvestments({
         const resolved = await resolveFundCodes(initialFunds);
         setResolvedFunds(resolved);
 
-        // Fetch stocks and funds data to find matches
-        const [stocksRes, fundsRes] = await Promise.all([
-          fetch("/api/market/stocks"),
-          fetch("/api/market/funds"),
-        ]);
+        // Try to fetch market data with timeout, but continue if unavailable
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-        const stocks = await stocksRes.json();
-        const funds = await fundsRes.json();
+          const [stocksRes, fundsRes] = await Promise.all([
+            fetch("/api/market/stocks", { signal: controller.signal }),
+            fetch("/api/market/funds", { signal: controller.signal }),
+          ]);
 
-        const dataMap: Record<string, MarketData> = {};
+          clearTimeout(timeoutId);
 
-        // Process stocks
-        Object.entries(stocks).forEach(([symbol, d]: [string, any]) => {
-          dataMap[symbol.toUpperCase()] = {
-            price: d.price,
-            change: d.change,
-            percent: d.percent,
-            symbol: symbol,
-            name: d.name || symbol,
-            type: "NSE",
-            id: `nse-${symbol}`,
-          };
-        });
+          if (stocksRes.ok && fundsRes.ok) {
+            const stocks = await stocksRes.json();
+            const funds = await fundsRes.json();
 
-        // Process funds
-        if (typeof funds === "object" && !Array.isArray(funds)) {
-          Object.entries(funds).forEach(([key, d]: [string, any]) => {
-            const id = d.isin ? `nse-${d.symbol || key}` : `nse-${key}`;
-            dataMap[key.toUpperCase()] = {
-              price: d.price || d.nav || 0,
-              change: d.change || 0,
-              percent: d.percent || d.percent_change || 0,
-              symbol: d.symbol || key,
-              name: d.name || key,
-              type: "FUND",
-              id: id,
-            };
-            if (d.isin)
-              dataMap[d.isin.toUpperCase()] = dataMap[key.toUpperCase()];
-          });
+            const dataMap: Record<string, MarketData> = {};
+
+            // Process stocks
+            if (typeof stocks === "object" && !Array.isArray(stocks)) {
+              Object.entries(stocks).forEach(([symbol, d]: [string, any]) => {
+                dataMap[symbol.toUpperCase()] = {
+                  price: d.price,
+                  change: d.change,
+                  percent: d.percent,
+                  symbol: symbol,
+                  name: d.name || symbol,
+                  type: "NSE",
+                  id: `nse-${symbol}`,
+                };
+              });
+            }
+
+            // Process funds
+            if (typeof funds === "object" && !Array.isArray(funds)) {
+              Object.entries(funds).forEach(([key, d]: [string, any]) => {
+                const id = d.isin ? `stock-${d.symbol || key}` : `stock-${key}`;
+                dataMap[key.toUpperCase()] = {
+                  price: d.price || d.nav || 0,
+                  change: d.change || 0,
+                  percent: d.percent || d.percent_change || 0,
+                  symbol: d.symbol || key,
+                  name: d.name || key,
+                  type: "FUND",
+                  id: id,
+                };
+                if (d.isin)
+                  dataMap[d.isin.toUpperCase()] = dataMap[key.toUpperCase()];
+              });
+            }
+
+            // For funds that don't have market data yet, fetch from mfapi.in
+            // Use faster concurrent fetching
+            await Promise.allSettled(
+              resolved.map(async (fund) => {
+                if (
+                  fund.schemeCode &&
+                  !dataMap[fund.name.toUpperCase()] &&
+                  !(fund.isin && dataMap[fund.isin.toUpperCase()])
+                ) {
+                  try {
+                    // Try /latest endpoint first for immediate price
+                    const latestRes = await fetch(
+                      `https://api.mfapi.in/mf/${fund.schemeCode}/latest`,
+                    );
+                    const latestJson = await latestRes.json();
+
+                    if (latestJson.data && latestJson.data.length > 0) {
+                      const latestPrice = parseFloat(latestJson.data[0].nav);
+
+                      // Update mapping immediately
+                      dataMap[fund.name.toUpperCase()] = {
+                        price: latestPrice,
+                        change: 0,
+                        percent: 0,
+                        symbol: (fund as any).schemeCode,
+                        name: fund.name,
+                        type: "FUND",
+                        id: `fund-${fund.schemeCode}`,
+                      };
+
+                      if (fund.isin)
+                        dataMap[fund.isin.toUpperCase()] =
+                          dataMap[fund.name.toUpperCase()];
+
+                      // Try to get history for trend (optional, don't crash)
+                      fetch(`https://api.mfapi.in/mf/${fund.schemeCode}`)
+                        .then((r) => r.json())
+                        .then((hist) => {
+                          if (hist.data && hist.data.length >= 2) {
+                            const current = parseFloat(hist.data[0].nav);
+                            const prev = parseFloat(hist.data[1].nav);
+                            const chg = current - prev;
+                            const pct = (chg / prev) * 100;
+                            // Update map (this will refresh on next state update or through direct setter)
+                            setMarketData((prevMap) => ({
+                              ...prevMap,
+                              [fund.name.toUpperCase()]: {
+                                ...prevMap[fund.name.toUpperCase()],
+                                price: current,
+                                change: chg,
+                                percent: pct,
+                              },
+                            }));
+                          }
+                        })
+                        .catch(() => {});
+                    }
+                  } catch (e) {
+                    /* ignore */
+                  }
+                }
+              }),
+            );
+
+            setMarketData((prev) => ({ ...prev, ...dataMap }));
+          }
+        } catch (marketErr) {
+          console.warn("Market data unavailable, proceeding without it");
         }
-
-        setMarketData(dataMap);
       } catch (err) {
-        console.error(
-          "Failed to fetch market data for advised investments:",
-          err,
-        );
+        console.error("Failed to fetch fund data:", err);
       } finally {
         setLoading(false);
       }
@@ -209,6 +295,40 @@ export default function AdvisedInvestments({
           View All <ArrowRight className="w-3 h-3" />
         </Link>
       </div>
+
+      {monthlyPlan && monthlyPlan.length > 0 && (
+        <div className="bg-card/50 border border-border/50 rounded-lg p-4">
+          <h3 className="text-sm font-semibold mb-3">Target Monthly SIP</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+            {[
+              { key: "sip_large_cap", label: "Large Cap" },
+              { key: "sip_mid_cap", label: "Mid Cap" },
+              { key: "sip_small_cap", label: "Small Cap" },
+              { key: "sip_debt", label: "Debt" },
+              { key: "sip_gold", label: "Gold" },
+            ].map(({ key, label }) => {
+              // Find months where SIP > 0 to get the actual target amount
+              const activeMonths = monthlyPlan.filter((m) => (m[key] || 0) > 0);
+              const targetAmount =
+                activeMonths.length > 0
+                  ? activeMonths[0][key]
+                  : monthlyPlan.reduce((sum, m) => sum + (m[key] || 0), 0) /
+                    monthlyPlan.length;
+
+              return (
+                <div key={key} className="text-center">
+                  <p className="text-xs text-muted-foreground mb-1">{label}</p>
+                  <p className="font-semibold">
+                    {targetAmount > 0
+                      ? `₹${targetAmount.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`
+                      : "—"}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {resolvedFunds.slice(0, 6).map((fund, i) => {
@@ -270,67 +390,30 @@ export default function AdvisedInvestments({
                 </div>
               </CardHeader>
               <CardContent className="p-4 pt-0 space-y-3">
-                <div className="flex items-end justify-between">
-                  <div>
-                    <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">
-                      Risk Type
-                    </p>
-                    <div className="flex items-baseline gap-2">
-                      <span
-                        className={`text-sm font-bold capitalize py-0.5 px-2 rounded-lg border ${getRiskColor(fund.risk_level)}`}
-                      >
-                        {fund.risk_level?.replace(/_/g, " ") || "—"}
-                      </span>
-                    </div>
-                  </div>
+                <div className="flex items-end justify-end">
                   <div className="text-right">
                     <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">
-                      Expense Ratio
-                    </p>
-                    <p className="text-sm font-bold text-primary">
-                      {fund.expense_ratio_pct}%
-                    </p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 py-2 border-y border-border/30">
-                  <div className="text-center">
-                    <p className="text-[9px] text-muted-foreground uppercase font-bold">
                       3Y Return
                     </p>
-                    <p className="text-xs font-semibold text-emerald-400">
+                    <p className="text-sm font-bold text-emerald-400">
                       {fund.returns_3y_pct}%
                     </p>
                   </div>
-                  <div className="text-center">
-                    <p className="text-[9px] text-muted-foreground uppercase font-bold">
-                      AMC
-                    </p>
-                    <p className="text-[10px] font-semibold text-muted-foreground">
-                      {fund.amc?.split(" ")[0] || "—"}
-                    </p>
-                  </div>
                 </div>
 
-                <div className="flex items-center justify-between">
-                  {fund.isin && (
-                    <span className="text-[10px] font-mono text-muted-foreground/50">
-                      {fund.isin}
-                    </span>
-                  )}
-                  <div className="flex items-center gap-1.5 grayscale opacity-50">
+                <div className="flex items-center justify-between pt-2 border-t border-border/30">
+                  <div className="flex items-center gap-1.5">
                     <Badge
                       variant="outline"
-                      className="text-[9px] px-1.5 py-0 h-4 bg-muted/20"
+                      className={`text-[9px] px-1.5 py-0 h-4 ${getRiskColor(fund.risk_level)}`}
                     >
-                      SIP
+                      {fund.risk_level?.replace(/_/g, " ")}
                     </Badge>
-                    <Badge
-                      variant="outline"
-                      className="text-[9px] px-1.5 py-0 h-4 bg-muted/20"
-                    >
-                      LONG
-                    </Badge>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[9px] text-muted-foreground font-semibold">
+                      Exp Ratio: {fund.expense_ratio_pct}%
+                    </p>
                   </div>
                 </div>
               </CardContent>

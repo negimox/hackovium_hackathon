@@ -1,10 +1,10 @@
-# Everything Money
+# Hackovium Hackathon
 
-This repo contains the main frontend app built with Next.js.
+This repo contains the project for Hackovium hackathon built with Next.js.
 
 ## Live @
 
-https://everythingmoney.vercel.app/
+https://hackovium-hackathon.vercel.app/
 
 ## To run locally
 

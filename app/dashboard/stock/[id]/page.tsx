@@ -89,14 +89,41 @@ export default function StockAnalysisPage({
         const symbol = parts.slice(1).join("-"); // Handle symbols with hyphens
 
         if (type === "fund" || type === "amfi") {
-          // Try to fetch from mfapi.in - symbol is expected to be schemeCode
+          // 1. Try /latest first for fast response
+          try {
+            const latestRes = await fetch(
+              `https://api.mfapi.in/mf/${symbol}/latest`,
+            );
+            const latestJson = await latestRes.json();
+            if (latestJson.meta) {
+              const meta = latestJson.meta;
+              const nav = parseFloat(latestJson.data?.[0]?.nav || "0");
+
+              setData({
+                price: nav,
+                change: 0,
+                percent: 0,
+                name: meta.scheme_name,
+                symbol: symbol,
+                isin: meta.isin_growth || meta.isin_reinvestment,
+                marketCap: meta.fund_house,
+                volume: meta.scheme_type,
+                high: nav,
+                low: nav,
+              });
+            }
+          } catch (e) {
+            console.warn("Failed to fetch latest NAV", e);
+          }
+
+          // 2. Fetch full history for trend and stats (high/low)
           const response = await fetch(`https://api.mfapi.in/mf/${symbol}`);
           const json = await response.json();
           if (json.meta) {
             const meta = json.meta;
-            const dataPoints = json.data;
-            const latest = dataPoints?.[0];
-            const prev = dataPoints?.[1];
+            const dataPoints = json.data || [];
+            const latest = dataPoints[0];
+            const prev = dataPoints[1];
 
             const nav = parseFloat(latest?.nav || "0");
             const prevNav = parseFloat(prev?.nav || "0");
@@ -115,16 +142,17 @@ export default function StockAnalysisPage({
               high: Math.max(
                 ...(dataPoints
                   ?.slice(0, 30)
-                  .map((d: any) => parseFloat(d.nav)) || [0]),
+                  .map((d: any) => parseFloat(d.nav)) || [nav]),
               ),
               low: Math.min(
                 ...(dataPoints
                   ?.slice(0, 30)
-                  .map((d: any) => parseFloat(d.nav)) || [0]),
+                  .map((d: any) => parseFloat(d.nav)) || [nav]),
               ),
             });
           }
-        } else {
+        }
+ else {
           const response = await fetch(`/api/watchlist/${type}`);
           const allData = await response.json();
 
